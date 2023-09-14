@@ -1,0 +1,3 @@
+{% macro print_if(condition, msg) %}
+  {% if condition -%}{{ msg }}{%- endif %}
+{% endmacro %}

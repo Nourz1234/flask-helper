@@ -1,0 +1,2 @@
+recursive-include flask_helper/assets *
+recursive-include flask_helper/templates *
