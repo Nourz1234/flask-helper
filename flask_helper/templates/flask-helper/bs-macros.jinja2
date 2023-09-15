@@ -1,5 +1,5 @@
 {% macro render_bs_form(form, class="", on_submit_success="null") -%}
-  <form class="needs-validation {{ class }}" {{ kwargs|xmlattr }} onsubmit="bsFormSubmit(this, event, {{ on_submit_success }});" novalidate>
+  <form class="needs-validation {{ class }}" enctype="{{ form.form_enctype }}" {{ kwargs|xmlattr }} onsubmit="bsFormSubmit(this, event, {{ on_submit_success }});" novalidate>
     {{ form.hidden_tag() }}
     <div class="text-danger" data-feedback-for="form">
     </div>

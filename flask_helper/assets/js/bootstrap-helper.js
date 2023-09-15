@@ -80,7 +80,7 @@ async function bsFormSubmit(form, event, successHandler) {
         else if (form.enctype == "application/x-www-form-urlencoded")
             formData = new URLSearchParams(new FormData(form).entries());
         let response = await fetch(form.action, {
-            method: form.method,
+            method: form.elements["form_method"].value,
             body: formData,
         });
         let responseData = await response.json();
