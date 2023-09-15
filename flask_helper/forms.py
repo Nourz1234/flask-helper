@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import Forbidden
 from wtforms import HiddenField
 
 from .errors import ValidationError
@@ -15,4 +16,6 @@ class FlaskFormEx(FlaskForm):
 
     def validate_or_raise(self):
         if not self.validate():
+            if "csrf_token" in self.errors:
+                raise Forbidden(self.errors["csrf_token"])
             raise ValidationError(self.errors)

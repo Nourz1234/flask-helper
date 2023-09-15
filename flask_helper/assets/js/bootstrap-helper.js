@@ -88,7 +88,7 @@ async function bsFormSubmit(form, event, successHandler) {
         if (response.status == 200) {
             requestSuccessful = true;
             if (successHandler) {
-                successHandler(responseData);
+                runWithContext(successHandler, { target: form, args: [form, responseData] });
             }
             else {
                 bsAlert("Success", "success", 5);
