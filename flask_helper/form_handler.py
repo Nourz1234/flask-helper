@@ -3,7 +3,7 @@ from typing import Callable
 from flask import request
 from werkzeug.exceptions import BadRequest
 
-from flask_helper.forms import FlaskFormEx
+from .forms import FlaskFormEx
 
 
 class FormsHandler:

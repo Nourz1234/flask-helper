@@ -1,11 +1,12 @@
 import os
 
-from flask_helper.util import normalize_database_url, parse_bool
+from .const import Environment
+from .util import normalize_database_url, parse_bool
 
 
 class BaseConfig:
     # General Config
-    ENV = "development"
+    ENV: Environment = Environment.Development
     PORT = int(os.environ.get("PORT", "5000"))
     SECRET_KEY = os.environ.get("SECRET_KEY")
     PREFERRED_URL_SCHEME = "http"
@@ -38,13 +39,13 @@ class BaseConfig:
 
 
 class BaseDevelopmentConfigMixIn:
-    ENV = "development"
+    ENV = Environment.Development
 
     EXPLAIN_TEMPLATE_LOADING = True
 
 
 class BaseProductionConfigMixIn:
-    ENV = "production"
+    ENV = Environment.Production
     PREFERRED_URL_SCHEME = "https"
 
     SESSION_COOKIE_SECURE = True

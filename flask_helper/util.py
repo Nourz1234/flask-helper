@@ -86,7 +86,9 @@ def parse_bool_or_default(string: Any, default: bool = False) -> bool:
     except ValueError:
         return default
 
+
 def normalize_database_url(url: str):
     import re
+
     url = re.sub(r"^postgres\b", "postgresql", url)
     return url
