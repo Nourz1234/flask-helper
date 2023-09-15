@@ -2,7 +2,7 @@ function bsEnsureAlertsContainer() {
     let container = document.querySelector("#bsAlertsContainer");
     if (!container) {
         let html = `
-        <div class="container-fluid fixed-top vstack p-3 pe-none" id="bsAlertsContainer">
+        <div class="container-fluid fixed-top vstack gap-3 p-3 pe-none" id="bsAlertsContainer">
         </div>
         `;
         document.body.insertAdjacentHTML("beforeend", html);
@@ -16,7 +16,7 @@ function bsAlert(message, category, timeout) {
     bsEnsureAlertsContainer();
 
     let html = `
-    <div class="alert alert-${category} alert-dismissible fade show ms-auto pe-auto" role="alert">
+    <div class="alert alert-${category} alert-dismissible fade show m-0 ms-auto pe-auto" role="alert">
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
