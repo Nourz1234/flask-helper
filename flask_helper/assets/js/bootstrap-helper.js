@@ -85,7 +85,7 @@ async function bsFormSubmit(form, event, successHandler) {
         });
         let responseData = await response.json();
 
-        if (response.status == 200) {
+        if (response.status >= 200 && response.status < 300) {
             requestSuccessful = true;
             if (successHandler) {
                 await runWithContext(successHandler, { target: form, args: [form, responseData] });
@@ -94,7 +94,7 @@ async function bsFormSubmit(form, event, successHandler) {
                 bsAlert("Success", "success", 5);
             }
         }
-        else if (response.status == 400 && responseData.description === "Validation error.") {
+        else if (response.status >= 400 && response.status < 500) {
             bsSetFormErrors(form, responseData.errors);
         }
         else {
