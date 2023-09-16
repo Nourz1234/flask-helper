@@ -16,7 +16,7 @@ def form_handler(form_type: type[FlaskFormEx]):
     return decorator
 
 
-def handle_request():
+def handle_form_submit():
     handlers: list[tuple[Callable, type[FlaskFormEx]]] = g.get("_from_handlers")
     handlers = handlers or []
     for func, form_type in handlers:

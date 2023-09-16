@@ -1,9 +1,9 @@
 from flask import Flask
 
 from . import blueprints
-from .error_handling import init_error_handlers
+from .error_handling import init_error_handlers # pyright: ignore
 
-__version__ = "1.5"
+__version__ = "1.6"
 
 def init_template_globals(app: Flask):
     from .util import pop_msg
