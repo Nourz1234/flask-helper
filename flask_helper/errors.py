@@ -1,10 +1,10 @@
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, InternalServerError
 from werkzeug.sansio.response import Response
 
 
 class AppError(HTTPException):
     code = 500
-    description = "Something went wrong."
+    description = InternalServerError.description
 
 
 class ValidationError(AppError):

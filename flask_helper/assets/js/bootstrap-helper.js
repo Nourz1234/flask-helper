@@ -98,7 +98,7 @@ async function bsFormSubmit(form, event, successHandler) {
             bsSetFormErrors(form, responseData.errors);
         }
         else {
-            bsAlert(responseData.description, "danger", 5);
+            bsAlert(responseData.description.replace("\n", "<br>"), "danger", 5);
         }
     }
     catch (err) {
