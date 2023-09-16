@@ -95,7 +95,12 @@ async function bsFormSubmit(form, event, successHandler) {
             }
         }
         else if (response.status >= 400 && response.status < 500) {
-            bsSetFormErrors(form, responseData.errors);
+            if ("errors" in responseData) {
+                bsSetFormErrors(form, responseData.errors);
+            }
+            else {
+                bsSetFormErrors(form, { form: [responseData.description] });
+            }
         }
         else {
             bsAlert(responseData.description.replace("\n", "<br>"), "danger", 5);
