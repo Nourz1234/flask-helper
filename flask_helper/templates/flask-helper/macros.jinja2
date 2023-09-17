@@ -1,3 +1,26 @@
 {% macro print_if(condition, msg) %}
-  {% if condition -%}{{ msg }}{%- endif %}
+  {% if condition %}{{ msg }}{% endif %}
+{% endmacro %}
+
+{% macro render_field_label(field) %}
+  <label for="{{ field.id }}" {{ kwargs|xmlattr }}>
+    {{ caller() }}
+  </label>
+{% endmacro %}
+
+{% macro render_field_input(field) %}
+  {{ field(kwargs) }}
+{% endmacro %}
+
+{# bootstrap macros #}
+{% macro render_bs_form(form, class="", on_submit_success="null") -%}
+  <form class="needs-validation {{ class }}" enctype="{{ form.form_enctype }}" {{ kwargs|xmlattr }} onsubmit="bsFormSubmit(this, event, {{ on_submit_success }});" novalidate>
+    <div class="text-danger" data-feedback-for="form"></div>
+    {{ form.hidden_tag() }}
+    {{ caller() }}
+  </form>
+{% endmacro %}
+
+{% macro render_bs_field_error(field) %}
+  <div class="invalid-feedback" data-feedback-for="{{ field.name }}"></div>
 {% endmacro %}
