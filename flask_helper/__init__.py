@@ -1,17 +1,19 @@
 from flask import Flask
 
 from . import blueprints
-from .error_handling import init_error_handlers # pyright: ignore
+from .error_handling import init_error_handlers  # pyright: ignore
 
-__version__ = "1.15"
+__version__ = "1.16"
+
 
 def init_template_globals(app: Flask):
-    from .util import pop_msg
+    from . import util
 
-    app.add_template_global(pop_msg)
+    app.add_template_global(util.pop_msg)
 
     app.add_template_filter(zip)
     app.add_template_filter(enumerate)
+    app.add_template_filter(util.dict_keys_snake_case_to_kebab_case)
 
 
 blueprint = blueprints.Blueprint(

@@ -3,7 +3,7 @@
 {% endmacro %}
 
 {% macro render_field_label(field) %}
-  <label for="{{ field.label.field_id }}" {{ kwargs|xmlattr }}>
+  <label for="{{ field.label.field_id }}" {{ kwargs|dict_keys_snake_case_to_kebab_case|xmlattr }}>
     {% if caller %}
       {{ caller() }}
     {% else %}
@@ -18,7 +18,7 @@
 
 {# bootstrap macros #}
 {% macro render_bs_form(form, class="", on_submit_success="null") -%}
-  <form class="needs-validation {{ class }}" enctype="{{ form.form_enctype }}" {{ kwargs|xmlattr }} onsubmit="bsFormSubmit(this, event, {{ on_submit_success }});" novalidate>
+  <form class="needs-validation {{ class }}" enctype="{{ form.form_enctype }}" {{ kwargs|dict_keys_snake_case_to_kebab_case|xmlattr }} onsubmit="bsFormSubmit(this, event, {{ on_submit_success }});" novalidate>
     <div class="text-danger" data-feedback-for="form"></div>
     {{ form.hidden_tag() }}
     {{ caller() }}

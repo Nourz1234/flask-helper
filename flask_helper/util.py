@@ -92,3 +92,7 @@ def normalize_database_url(url: str):
 
     url = re.sub(r"^postgres\b", "postgresql", url)
     return url
+
+
+def dict_keys_snake_case_to_kebab_case(dict: dict[str, Any]):
+    return {k.replace("_", "-"): v for k, v in dict.items()}
