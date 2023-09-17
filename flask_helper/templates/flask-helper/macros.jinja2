@@ -3,13 +3,13 @@
 {% endmacro %}
 
 {% macro render_field_label(field) %}
-  <label for="{{ field.id }}" {{ kwargs|xmlattr }}>
-    {{ caller() }}
+  <label for="{{ field.label.field_id }}" {{ kwargs|xmlattr }}>
+    {{ caller() or field.label.text }}
   </label>
 {% endmacro %}
 
 {% macro render_field_input(field) %}
-  {{ field(kwargs) }}
+  {{ field(**kwargs) }}
 {% endmacro %}
 
 {# bootstrap macros #}
