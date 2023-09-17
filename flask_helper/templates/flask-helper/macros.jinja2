@@ -4,7 +4,11 @@
 
 {% macro render_field_label(field) %}
   <label for="{{ field.label.field_id }}" {{ kwargs|xmlattr }}>
-    {{ caller() or field.label.text }}
+    {% if caller %}
+      {{ caller() }}
+    {% else %}
+      {{ field.label.text }}
+    {% endif %}
   </label>
 {% endmacro %}
 
