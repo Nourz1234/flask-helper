@@ -3,7 +3,7 @@ from flask import Flask
 from . import blueprints
 from .error_handling import init_error_handlers  # pyright: ignore
 
-__version__ = "1.17"
+__version__ = "1.18"
 
 
 def init_template_globals(app: Flask):

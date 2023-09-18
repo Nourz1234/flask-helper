@@ -33,14 +33,14 @@ def request_cache(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        property_name = f"_cached_func_{id(func)}"
+        property_name = f"_caching_func_{id(func)}"
         if hasattr(g, property_name):
-            func = getattr(g, property_name)
+            caching_func = getattr(g, property_name)
         else:
-            func = functools.lru_cache(func)
-            setattr(g, property_name, func)
+            caching_func = functools.lru_cache(func)
+            setattr(g, property_name, caching_func)
 
-        return func(*args, **kwargs)
+        return caching_func(*args, **kwargs)
 
     return wrapper
 
