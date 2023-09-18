@@ -29,10 +29,13 @@ def pop_msg(name: str) -> tuple[str | None, str | None]:
 
 
 def request_cache(func):
-    from flask import g
+    from flask import g, has_app_context
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        if not has_app_context():
+            return func(*args, **kwargs)
+
         property_name = f"_caching_func_{id(func)}"
         if hasattr(g, property_name):
             caching_func = getattr(g, property_name)
