@@ -4,9 +4,11 @@ from contextvars import ContextVar
 import sqlalchemy
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
+
 class Database:
     engine: sqlalchemy.Engine = None
     _session: scoped_session[Session] = None
+    _context_entered: ContextVar[int] = ContextVar("_context_entered", default=0)
 
     def init(self, url, session_options):
         if self.engine:
@@ -26,8 +28,6 @@ class Database:
                 "Can't access the session outside of the database context."
             )
         return self._session
-
-    _context_entered: ContextVar[int] = ContextVar("_context_entered", default=0)
 
     @property
     def context_entered(self):

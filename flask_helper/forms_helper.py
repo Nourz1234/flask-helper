@@ -8,16 +8,16 @@ from .forms import FlaskFormEx
 
 def form_handler(form_type: type[FlaskFormEx]):
     def decorator(func):
-        if not hasattr(g, "_from_handlers"):
-            g._from_handlers = []
-        g._from_handlers.append((func, form_type))
+        if not hasattr(g, "_form_handlers"):
+            g._form_handlers = []
+        g._form_handlers.append((func, form_type))
         return func
 
     return decorator
 
 
 def handle_form_submit():
-    handlers: list[tuple[Callable, type[FlaskFormEx]]] = g.get("_from_handlers")
+    handlers: list[tuple[Callable, type[FlaskFormEx]]] = g.get("_form_handlers")
     handlers = handlers or []
     for func, form_type in handlers:
         if request.method == "GET":

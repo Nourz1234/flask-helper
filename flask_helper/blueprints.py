@@ -1,26 +1,18 @@
-from contextvars import ContextVar
 from typing import Any, Callable
 
 from flask import Blueprint, Flask, blueprints
 from flask.app import Flask
 
-_host: ContextVar[str | None] = ContextVar("_host", default=None)
-_host_set: ContextVar[bool] = ContextVar("_host_set", default=False)
-
 
 class Blueprint(blueprints.Blueprint):
     def register(self, app: Flask, options: dict) -> None:
-        if "host" in options and not _host_set.get():
-            _host.set(options.get("host"))
-            _host_set.set(True)
+        prev_host = getattr(app, "_blueprint_host", None)
+        setattr(app, "_blueprint_host", options.get("host"))
 
-            try:
-                return super().register(app, options)
-            finally:
-                _host.set(None)
-                _host_set.set(False)
-        else:
+        try:
             return super().register(app, options)
+        finally:
+            setattr(app, "_blueprint_host", prev_host)
 
     def make_setup_state(
         self, app: Flask, options: dict, first_registration: bool = False
@@ -34,7 +26,7 @@ class BlueprintSetupState(blueprints.BlueprintSetupState):
     ) -> None:
         super().__init__(blueprint, app, options, first_registration)
 
-        self.host = _host.get()
+        self.host = app._blueprint_host
         if self.host is not None and "PORT" in app.config and app.config["PORT"] != 80:
             self.host = f"{self.host}:{app.config['PORT']}"
 

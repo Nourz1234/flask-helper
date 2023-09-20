@@ -12,30 +12,34 @@ from .errors import ValidationError
 class FormMetaClass(FormMeta):
     def __new__(cls, name, bases, attr):
         # detect if there is a file field and update enctype
-        file_fields: list[UnboundField] = list(
-            filter(
-                lambda x: isinstance(x, UnboundField) and x.field_class is FileField,
-                attr.values(),
-            )
-        )
+        file_fields = [
+            val
+            for val in attr.values()
+            if isinstance(val, UnboundField) and val.field_class is FileField
+        ]
         if file_fields:
             attr["form_enctype"] = FormEncodingType.MULTIPART.value
+
         # detect "FileAllowed" validator and use it to populate "accept" attribute
         for file_field in file_fields:
             validators = file_field.kwargs.get("validators")
             if not validators:
                 continue
 
-            file_allowed_validator: FileAllowed = next(
-                filter(lambda x: isinstance(x, FileAllowed), validators), None
-            )
-            if not file_allowed_validator:
+            file_allowed_validators = [
+                validator
+                for validator in validators
+                if isinstance(validator, FileAllowed)
+            ]
+            if not file_allowed_validators:
                 continue
 
-            accept = ",".join([f".{ext}" for ext in file_allowed_validator.upload_set])
             render_kw = file_field.kwargs.get("render_kw", {})
-            render_kw["accept"] = accept
-            file_field.kwargs["render_kw"] = render_kw
+            if "accept" not in render_kw:
+                upload_set = file_allowed_validators[0].upload_set
+                accept = ",".join([f".{ext}" for ext in upload_set])
+                render_kw["accept"] = accept
+                file_field.kwargs["render_kw"] = render_kw
 
         return super().__new__(cls, name, bases, attr)
 
