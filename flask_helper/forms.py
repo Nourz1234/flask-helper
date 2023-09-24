@@ -1,9 +1,9 @@
 import flask_wtf
 from flask_wtf.file import FileAllowed, FileField
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden as ForbiddenError
 from wtforms import HiddenField
 from wtforms.fields.core import UnboundField
-from wtforms.form import FormMeta
+from wtforms.form import Form, FormMeta
 
 from .const import FormEncodingType
 from .errors import ValidationError
@@ -27,9 +27,7 @@ class FormMetaClass(FormMeta):
                 continue
 
             file_allowed_validators = [
-                validator
-                for validator in validators
-                if isinstance(validator, FileAllowed)
+                validator for validator in validators if isinstance(validator, FileAllowed)
             ]
             if not file_allowed_validators:
                 continue
@@ -45,9 +43,9 @@ class FormMetaClass(FormMeta):
 
 
 class FlaskFormEx(flask_wtf.FlaskForm, metaclass=FormMetaClass):
-    form_name: str = None
+    form_name: str = "form"
     form_method: str = "POST"
-    form_enctype: FormEncodingType = FormEncodingType.URL_ENCODED.value
+    form_enctype: str = FormEncodingType.URL_ENCODED.value
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -60,5 +58,11 @@ class FlaskFormEx(flask_wtf.FlaskForm, metaclass=FormMetaClass):
     def validate_or_raise(self):
         if not self.validate():
             if "csrf_token" in self.errors:
-                raise Forbidden(self.errors["csrf_token"][0])
+                raise ForbiddenError(self.errors["csrf_token"][0])
+            raise ValidationError(self.errors)
+
+
+class APIForm(Form):
+    def validate_or_raise(self):
+        if not self.validate():
             raise ValidationError(self.errors)

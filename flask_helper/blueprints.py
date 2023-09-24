@@ -1,7 +1,6 @@
 from typing import Any, Callable
 
-from flask import Blueprint, Flask, blueprints
-from flask.app import Flask
+from flask import Flask, blueprints
 
 
 class Blueprint(blueprints.Blueprint):
@@ -26,7 +25,7 @@ class BlueprintSetupState(blueprints.BlueprintSetupState):
     ) -> None:
         super().__init__(blueprint, app, options, first_registration)
 
-        self.host = app._blueprint_host
+        self.host: str | None = getattr(app, "_blueprint_host")
         if self.host is not None and "PORT" in app.config and app.config["PORT"] != 80:
             self.host = f"{self.host}:{app.config['PORT']}"
 

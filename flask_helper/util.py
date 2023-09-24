@@ -1,7 +1,10 @@
 import functools
 import random
 import string
-from typing import Any
+from typing import Any, Callable, ParamSpec, TypeVar
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 
 class Lazy:
@@ -28,11 +31,14 @@ def pop_msg(name: str) -> tuple[str | None, str | None]:
     return msg, category
 
 
-def request_cache(func):
+def request_cache(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Works like `lru_cache` but the cache is preserved only for the duration of the flask request.
+    """
     from flask import g, has_app_context
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         if not has_app_context():
             return func(*args, **kwargs)
 
@@ -48,11 +54,45 @@ def request_cache(func):
     return wrapper
 
 
-def api_endpoint(func):
+def make_authorizer(auth_func: Callable[[], bool], description="Unauthorized."):
+    """
+    example:
+    ```python
+    def auth_func():
+        return request.headers.get("access-token") == ACCESS_TOKEN
+
+    auth_required = make_authorizer(auth_func, "Invalid access token.")
+
+    @app.route("/users")
+    @auth_required
+    def secure_endpoint():
+        ...
+    ```
+    """
+    from werkzeug.exceptions import Unauthorized as UnauthorizedError
+
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @functools.wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            if not auth_func():
+                raise UnauthorizedError(description=description)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def api_endpoint(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Marks the route as an API endpoint.
+    API endpoints will return a JSON response on error instead of a HTML response.
+    Use `is_api_endpoint` to determine if the current request is on an API endpoint.
+    """
     from flask import g
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         g.api_endpoint = True
         return func(*args, **kwargs)
 
@@ -66,21 +106,24 @@ def is_api_endpoint() -> bool:
 
 
 def generate_token(length=50) -> str:
+    """
+    Generates a random string form numbers and upper and lower case letters.
+    """
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
-def parse_bool(x: Any) -> bool:
-    if isinstance(x, bool):
-        return x
-    if not isinstance(x, str):
-        raise ValueError("Expecting a string to parse")
-    x = x.strip().lower()
-    if x in ["true", "t", "yes", "y", "1"]:
+def parse_bool(string: Any) -> bool:
+    if isinstance(string, bool):
+        return string
+    if not isinstance(string, str):
+        raise ValueError("Expecting a string to parse.")
+    string = string.strip().lower()
+    if string in ["true", "t", "yes", "y", "1"]:
         return True
-    elif x in ["false", "f", "no", "n", "0"]:
+    elif string in ["false", "f", "no", "n", "0"]:
         return False
     else:
-        raise ValueError("String is not a boolean")
+        raise ValueError("String is not a boolean.")
 
 
 def parse_bool_or_default(string: Any, default: bool = False) -> bool:
@@ -90,12 +133,12 @@ def parse_bool_or_default(string: Any, default: bool = False) -> bool:
         return default
 
 
-def normalize_database_url(url: str):
+def normalize_database_url(url: str) -> str:
     import re
 
     url = re.sub(r"^postgres\b", "postgresql", url)
     return url
 
 
-def dict_keys_snake_case_to_kebab_case(dict: dict[str, Any]):
+def dict_keys_snake_case_to_kebab_case(dict: dict[str, Any]) -> dict[str, Any]:
     return {k.replace("_", "-"): v for k, v in dict.items()}

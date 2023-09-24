@@ -1,9 +1,10 @@
 from flask import Flask
 
 from . import blueprints
-from .error_handling import init_error_handlers  # pyright: ignore
+from .error_handling import init_error_handlers
 
-__version__ = "1.20"
+__version__ = "1.21"
+__all__ = ["init_error_handlers", "init_template_globals", "blueprint"]
 
 
 def init_template_globals(app: Flask):

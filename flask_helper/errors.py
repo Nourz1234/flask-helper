@@ -5,7 +5,7 @@ from werkzeug.sansio.response import Response
 class ValidationError(HTTPException):
     code = 400
     description = "Validation error."
-    errors: dict[str, list[str]] = None
+    errors: dict[str, list[str]] = {}
 
     def __init__(
         self,
