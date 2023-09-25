@@ -56,7 +56,7 @@ def request_cache(func: Callable[P, T]) -> Callable[P, T]:
 
 def make_authorizer(auth_func: Callable[[], bool], description="Unauthorized."):
     """
-    example:
+    usage:
     ```python
     def auth_func():
         return request.headers.get("access-token") == ACCESS_TOKEN
@@ -87,6 +87,17 @@ def api_endpoint(func: Callable[P, T]) -> Callable[P, T]:
     """
     Marks the route as an API endpoint.
     API endpoints will return a JSON response on error instead of a HTML response.
+    Should be used right after the `@app.route` decorator.
+
+    example:
+    ```
+    @app.route('/users')
+    @api_endpoint
+    @login_required
+    def users():
+        ...
+    ```
+
     Use `is_api_endpoint` to determine if the current request is on an API endpoint.
     """
     from flask import g
