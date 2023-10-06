@@ -1,12 +1,12 @@
 import functools
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from flask import g, request
+from flask import typing as ft
 from werkzeug.exceptions import BadRequest
 
 from .forms import APIForm, FlaskFormEx
 
-T = TypeVar("T")
 P = ParamSpec("P")
 T_FlaskForm = TypeVar("T_FlaskForm", bound=FlaskFormEx)
 T_APIForm = TypeVar("T_APIForm", bound=APIForm)
@@ -16,7 +16,7 @@ def form_handler(form_type: type[T_FlaskForm]):
     if not issubclass(form_type, FlaskFormEx):
         raise TypeError(f"Expecting a subclass of {FlaskFormEx.__name__}")
 
-    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+    def decorator(func: Callable[[T_FlaskForm], ft.ResponseReturnValue]):
         if not hasattr(g, "_form_handlers"):
             g._form_handlers = []
         g._form_handlers.append((func, form_type))
@@ -26,7 +26,11 @@ def form_handler(form_type: type[T_FlaskForm]):
 
 
 def handle_form_submit():
-    handlers: list[tuple[Callable, type[FlaskFormEx]]] = g.get("_form_handlers", [])
+    handlers: list[
+        tuple[Callable[[FlaskFormEx], ft.ResponseReturnValue], type[FlaskFormEx]]
+    ] = g.get("_form_handlers", [])
+    if not handlers:
+        raise RuntimeError("No form handlers where defined for the current request.")
     for func, form_type in handlers:
         if request.method == "GET":
             form_data = request.args
@@ -46,13 +50,12 @@ def api_endpoint_form(form_type: type[T_APIForm]):
     if not issubclass(form_type, APIForm):
         raise TypeError(f"Expecting a subclass of {APIForm.__name__}")
 
-    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+    def decorator(func: Callable[Concatenate[T_APIForm, P], ft.ResponseReturnValue]):
         @functools.wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> ft.ResponseReturnValue:
             form = form_type()
             form.validate_or_raise()
-            kwargs.update(form=form)
-            return func(*args, **kwargs)
+            return func(form, *args, **kwargs)
 
         return wrapper
 

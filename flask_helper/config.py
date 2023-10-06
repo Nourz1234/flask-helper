@@ -1,7 +1,7 @@
 import os
 
 from .const import Environment
-from .util import normalize_database_url, parse_bool
+from .util import normalize_sqlalchemy_database_url, parse_bool
 
 
 class BaseConfig:
@@ -17,9 +17,9 @@ class BaseConfig:
     EXPLAIN_TEMPLATE_LOADING = False
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = normalize_database_url(os.environ.get("DATABASE_URL", ""))
+    SQLALCHEMY_DATABASE_URI = normalize_sqlalchemy_database_url(os.environ.get("DATABASE_URL", ""))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_SESSION_OPTIONS = {"autoflush": False, "expire_on_commit": False}
+    SQLALCHEMY_SESSION_OPTIONS: dict = {"autoflush": False, "expire_on_commit": False}
 
     # Flask
     SESSION_COOKIE_NAME = "session"

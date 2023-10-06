@@ -6,6 +6,9 @@ from typing import Any, Callable, ParamSpec, TypeVar
 T = TypeVar("T")
 P = ParamSpec("P")
 
+TRUE_VALUES = ["true", "t", "yes", "y", "1"]
+FALSE_VALUES = ["false", "f", "no", "n", "0"]
+
 
 class Lazy:
     def __init__(self, func):
@@ -123,28 +126,35 @@ def generate_token(length=50) -> str:
     return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
 
-def parse_bool(string: Any) -> bool:
-    if isinstance(string, bool):
-        return string
-    if not isinstance(string, str):
+def parse_bool(
+    value: str,
+    true_values: list[str] = TRUE_VALUES,
+    false_values: list[str] = FALSE_VALUES,
+) -> bool:
+    if not isinstance(value, str):
         raise ValueError("Expecting a string to parse.")
-    string = string.strip().lower()
-    if string in ["true", "t", "yes", "y", "1"]:
+    value = value.strip().lower()
+    if value in true_values:
         return True
-    elif string in ["false", "f", "no", "n", "0"]:
+    elif value in false_values:
         return False
     else:
         raise ValueError("String is not a boolean.")
 
 
-def parse_bool_or_default(string: Any, default: bool = False) -> bool:
+def parse_bool_or_default(
+    value: str,
+    default: bool = False,
+    true_values: list[str] = TRUE_VALUES,
+    false_values: list[str] = FALSE_VALUES,
+) -> bool:
     try:
-        return parse_bool(string)
+        return parse_bool(value, true_values=true_values, false_values=false_values)
     except ValueError:
         return default
 
 
-def normalize_database_url(url: str) -> str:
+def normalize_sqlalchemy_database_url(url: str) -> str:
     import re
 
     url = re.sub(r"^postgres\b", "postgresql", url)

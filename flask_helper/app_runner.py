@@ -12,5 +12,5 @@ def run(app_factory: Callable[[], Flask]):
     app = app_factory()
     app.run(
         port=app.config.get("PORT", 5000),
-        use_reloader=parse_bool(os.environ.get("USE_RELOADER", True)),
+        use_reloader=parse_bool(os.environ.get("USE_RELOADER", "True")),
     )
